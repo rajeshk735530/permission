@@ -10,7 +10,8 @@ class PermissionController extends Controller
 {
     //THis method will show permissions page
     public function index() {
-        return view('permissions.list');
+        $permissions = Permission::orderBy('created_at', 'DESC')->paginate(10);
+        return view('permissions.list', ['permissions' => $permissions]);
     }
 
     //THis method will show create permissions page
