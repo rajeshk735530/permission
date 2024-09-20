@@ -34,13 +34,27 @@ class PermissionController extends Controller
     }
 
     //THis method will show edit permissions page
-    public function edit() {
-        
+    public function edit($id) {
+        $permission = Permission::findOrFail($id);
+        return view('permissions.edit', ['permission' => $permission]);
     }
 
     //THis method will show update a permissions
-    public function update() {
+    public function update($id, Request $request) {        
+        $permission = Permission::findOrFail($id);
         
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:3|unique:permissions,name,'.$id.',id'
+        ]);
+
+        if ($validator->passes()) {
+            $permission->name = $request->name;
+            $permission->save();
+
+            return redirect()->route('permissions.index')->with('success', 'Permission updated successfully');
+        }else{
+            return redirect()->route('permissions.edit', $id)->withInput()->withErrors($validator);
+        }        
     }
 
     //THis method will show delete a permissions
