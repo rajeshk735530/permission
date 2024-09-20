@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
     //THis method will show permissions page
     public function index() {
-
+        return view('permissions.list');
     }
 
     //THis method will show create permissions page
@@ -17,8 +19,17 @@ class PermissionController extends Controller
     }
 
     //THis method will insert a permissions in DB
-    public function store() {
-        
+    public function store(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|unique:permissions|min:3'
+        ]);
+
+        if ($validator->passes()) {
+            Permission::create(['name'=>$request->name]);
+            return redirect()->route('permissions.index')->with('success', 'Permission added successfully');
+        }else{
+            return redirect()->route('permissions.create')->withInput()->withErrors($validator);
+        }
     }
 
     //THis method will show edit permissions page
