@@ -40,7 +40,7 @@ class PermissionController extends Controller
     }
 
     //THis method will show update a permissions
-    public function update($id, Request $request) {        
+    public function update($id, Request $request) {
         $permission = Permission::findOrFail($id);
         
         $validator = Validator::make($request->all(), [
@@ -54,7 +54,7 @@ class PermissionController extends Controller
             return redirect()->route('permissions.index')->with('success', 'Permission updated successfully');
         }else{
             return redirect()->route('permissions.edit', $id)->withInput()->withErrors($validator);
-        }        
+        }
     }
 
     //THis method will show delete a permissions in DB
