@@ -13,7 +13,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::latest()->paginate(1); // Order by created_at DESC
+        $articles = Article::latest()->paginate(5); // Order by created_at DESC
 
         return view('articles.list', [
             'articles' => $articles
@@ -53,19 +53,12 @@ class ArticleController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        $article = Article::findOrFail($id);
+        return view('articles.edit', ['article' => $article]);
     }
 
     /**
@@ -73,14 +66,46 @@ class ArticleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $article = Article::findOrFail($id);
+
+        $validator = Validator::make($request->all(),[
+            'title' => 'required|min:3',
+            'author' => 'required|min:3'
+        ]);
+
+        if ($validator->passes()) {
+
+            $article->title = $request->title;
+            $article->text = $request->text;
+            $article->author = $request->author;
+            $article->save();
+
+            return redirect()->route('articles.index')->with('success', 'Article Update successfully');
+        }else{
+            return redirect()->route('articles.edit')->withInput()->withErrors($validator);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $article = Article::find($request->id);
+
+        if ($article == null) 
+        {
+            session()->flash('error', 'Article not found');
+            return response()->json([
+                'status' => flase
+            ]);
+        }
+
+        $article->delete();
+        
+        session()->flash('success', 'Article delete successfully');
+        return response()->json([
+            'status' => true
+        ]);
     }
 }
