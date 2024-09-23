@@ -4,7 +4,9 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('User') }}
             </h2>
-            {{-- <a href="{{ route('users.create') }}" class="bg-slate-700 text-sm rounded-md text-white px-3 py-2">Create</a> --}}
+            @can('create users')
+            <a href="{{ route('users.create') }}" class="bg-slate-700 text-sm rounded-md text-white px-3 py-2">Create</a>
+            @endcan
         </div>
     </x-slot>
 
@@ -34,8 +36,11 @@
                         <td  class="px-6 py-3 text-left">{{ $user->roles->pluck('name')->implode(', ') }}</td>
                         <td  class="px-6 py-3 text-left">{{ \carbon\carbon::parse($user->created_at)->format('d M Y') }}</td>
                         <td  class="px-6 py-3 text-center">
+
+                            @can('edit users')
                             <a href="{{ route("users.edit", $user->id) }}" class="bg-slate-700 text-sm rounded-md text-white px-3 py-2 hover:bg-slate-600">Edit</a>
-                            {{-- <a href="javascript:void(0);" onclick="deleteUser({{ $user->id }})" class="bg-red-600 text-sm rounded-md text-white px-3 py-2 hover:bg-red-500">Delete</a> --}}
+                            @endcan
+                            <a href="javascript:void(0);" onclick="deleteUser({{ $user->id }})" class="bg-red-600 text-sm rounded-md text-white px-3 py-2 hover:bg-red-500">Delete</a>
                         </td>
                     </tr>
                     @endforeach
@@ -49,10 +54,10 @@
     </div>
     <x-slot name="script">
         <script type="text/javascript">
-            function deleteRole(id) {
+            function deleteUser(id) {
                 if (confirm("Are you sure you want to delete?")){
                     $.ajax({
-                        url  : '{{ route("roles.destroy") }}',
+                        url  : '{{ route("users.destroy") }}',
                         type : 'delete',
                         data : {id:id},
                         datatype : 'json',
@@ -60,7 +65,7 @@
                             'x-csrf-token' : '{{ csrf_token() }}'
                         },
                         success: function(response) {
-                            window.location.href = '{{ route("roles.index") }}'
+                            window.location.href = '{{ route("users.index") }}'
                         }
                     })
                 }
